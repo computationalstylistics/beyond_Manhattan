@@ -33,6 +33,9 @@ dist_l_norm = function(frequencies, l = 1, scale = TRUE) {
 	for(source_txt in 1:(no_of_txts -1)) {
 		for(target_txt in (source_txt +1):no_of_txts) {
 			raw_diff = frequencies[source_txt, ] - frequencies[target_txt, ]
+			### get rid of 0 differences
+			### this will not harm for powers >0, while sanitizing powers <=0
+			raw_diff = raw_diff[raw_diff != 0]
 			delta = sum(abs(raw_diff) ^l) ^(1/l)
 			dist_matrix[target_txt, source_txt] = delta
 		}
@@ -155,16 +158,16 @@ iterate_over_mfw_ranges = function(frequencies, mfw = seq(100, 1000, 100), ...){
 #
 #############################################################
 
-results_EN = iterate_over_mfw_ranges(freqs_100_novels_EN, mfw = seq(100, 1000, 100), grid_l = seq(0.1, 10, 0.1))
+results_EN = iterate_over_mfw_ranges(freqs_100_novels_EN, mfw = seq(100, 1000, 100), grid_l = seq(-10, 10, 0.1))
 save(results_EN, file = "freqs_100_novels_EN_RESULTS.RData")
 
-results_PL = iterate_over_mfw_ranges(freqs_100_novels_PL, mfw = seq(100, 1000, 100), grid_l = seq(0.1, 10, 0.1))
+results_PL = iterate_over_mfw_ranges(freqs_100_novels_PL, mfw = seq(100, 1000, 100), grid_l = seq(-10, 10, 0.1))
 save(results_PL, file = "freqs_100_novels_PL_RESULTS.RData")
 
-results_LEE = iterate_over_mfw_ranges(lee, mfw = seq(100, 1000, 100), grid_l = seq(0.1, 10, 0.1))
+results_LEE = iterate_over_mfw_ranges(lee, mfw = seq(100, 1000, 100), grid_l = seq(-10, 10, 0.1))
 save(results_LEE, file = "freqs_100_novels_LEE_RESULTS.RData")
 
-results_GALBRAITH = iterate_over_mfw_ranges(galbraith, mfw = seq(100, 1000, 100), grid_l = seq(0.1, 10, 0.1))
+results_GALBRAITH = iterate_over_mfw_ranges(galbraith, mfw = seq(100, 1000, 100), grid_l = seq(-10, 10, 0.1))
 save(results_GALBRAITH, file = "freqs_100_novels_GALBRAITH_RESULTS.RData")
 
 
@@ -190,7 +193,7 @@ load("freqs_100_novels_LEE_RESULTS.RData")
 
 #png(file = "results_GALBRAITH.png", width = 7, height = 5, units = "in", res = 300)
 
-current_results = results_GALBRAITH
+current_results = results_PL
 no_of_results = dim(current_results)[1]
 f1_min = min(current_results)
 f1_max = max(current_results)
@@ -200,7 +203,7 @@ color_palette = viridis(no_of_results)
 #f1_min = 0.5
 #f1_max = 0.8
 
-plot(1:length(axis_x) ~ axis_x, type = "n", ylim = c(f1_min, f1_max), xlim = c(0,7),
+plot(1:length(axis_x) ~ axis_x, type = "n", ylim = c(f1_min, f1_max), xlim = c(-2,7),
 	ylab = "performance (f1 value)", xlab = "L norm (power)")
 segments(1, 0.77, 1, 1, lty = 3, lwd = 2, col = "darkgray")
 segments(2, 0.77, 2, 1, lty = 3, lwd = 2, col = "darkgray")
